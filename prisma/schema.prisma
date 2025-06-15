@@ -1,34 +1,25 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  // output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
 model User {
-  id            Int       @id @default(autoincrement())
-  username      String    @unique
-  password      String
-  role          Role      @default(WRITER)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  
-  // Relations
-  posts         Post[]    @relation("UserPosts")
-  comments      Comment[] @relation("AuthorComments")
-  
-  // Self-referential relation for creator tracking
-  createdById   Int?
-  createdBy     User?     @relation("UserCreator", fields: [createdById], references: [id])
-  createdUsers  User[]    @relation("UserCreator")
+  id           Int       @id @default(autoincrement())
+  username     String    @unique
+  password     String
+  role         Role      @default(WRITER)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  posts        Post[]    @relation("UserPosts")
+  comments     Comment[] @relation("AuthorComments")
+  createdById  Int?
+  createdBy    User?     @relation("UserCreator", fields: [createdById], references: [id])
+  createdUsers User[]    @relation("UserCreator")
+  orders       Order[]
 }
 
 model Post {
@@ -47,20 +38,105 @@ model Comment {
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  userName  String?  // Optional for anonymous users
-  
+  userName  String?
   postId    Int
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  
-  // Optional relation to User for authenticated comments
   authorId  Int?
   author    User?    @relation("AuthorComments", fields: [authorId], references: [id])
-
   @@index([postId])
   @@index([authorId])
+}
+
+model MenuItem {
+  id          Int         @id @default(autoincrement())
+  name        String
+  price       Float
+  inventoryId Int?
+  inventory   Inventory?  @relation(fields: [inventoryId], references: [id])
+  orderItems  OrderItem[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Order {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  customerId  Int?
+  customer    User?    @relation(fields: [customerId], references: [id])
+  type        String
+  total       Float
+  status      OrderStatus @default(PENDING)
+  items       OrderItem[]
+  delivery    Delivery? @relation("OrderDelivery")
+}
+model OrderItem {
+  id         Int               @id @default(autoincrement())
+  orderId    Int
+  order      Order             @relation(fields: [orderId], references: [id])
+  menuItemId Int
+  menuItem   MenuItem          @relation(fields: [menuItemId], references: [id])
+  quantity   Int
+  price      Float
+  status     PreparationStatus @default(PENDING)
+}
+
+model Inventory {
+  id        Int        @id @default(autoincrement())
+  itemName  String
+  quantity  Int
+  threshold Int        @default(10)
+  updatedAt DateTime   @updatedAt
+  menuItems MenuItem[]
 }
 
 enum Role {
   WRITER
   ADMIN
+  CASHIER
+  CHEF
+  DELIVERY
+  BRANCH_MANAGER
+  HQ_MANAGER
+  SUPPORT
+  CUSTOMER
+}
+
+enum OrderStatus {
+  PENDING
+  PREPARING
+  READY
+  SERVED
+  CANCELLED
+}
+
+enum PreparationStatus {
+  PENDING
+  IN_PROGRESS
+  READY
+}
+
+model Delivery {
+  id         Int            @id @default(autoincrement())
+  orderId    Int            @unique
+  order      Order          @relation("OrderDelivery", fields: [orderId], references: [id])
+  status     DeliveryStatus @default(PENDING)
+  assignedAt DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+}
+
+enum DeliveryStatus {
+  PENDING
+  IN_PROGRESS
+  DELIVERED
+  FAILED
+}
+
+model SupportTicket {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  status      String    @default("OPEN")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
