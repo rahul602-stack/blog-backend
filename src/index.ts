@@ -13,7 +13,6 @@ import { seedAdminUser } from './utils/seedAdmin';
 import inventoryRoutes from './routes/inventoryRoutes';
 import menuRoutes from './routes/menuRoutes';
 import reportRoutes from './routes/reportRoutes';
-import hqReportRoutes from './routes/hqReportRoutes';
 import cashierRoutes from './routes/cashierRoutes'; 
 import supportRoutes from './routes/supportRoutes';
 
@@ -39,7 +38,6 @@ app.use('/api/deliveries', deliveryRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/reports', reportRoutes);
-app.use('/api/hq/reports', hqReportRoutes);
 app.use('/api/cashier', cashierRoutes);
 app.use('/api/support', supportRoutes);
 
