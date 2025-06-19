@@ -58,3 +58,4 @@ export const login = async (req: Request, res: Response): Promise<any> => {
     user: userWithoutPassword
   });
 };
+
