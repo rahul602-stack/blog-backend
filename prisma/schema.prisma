@@ -100,6 +100,7 @@ enum Role {
   HQ_MANAGER
   SUPPORT
   CUSTOMER
+  KITCHEN
 }
 
 enum OrderStatus {

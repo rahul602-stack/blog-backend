@@ -1,5 +1,6 @@
-import prisma from '../utils/prisma';
+// menuItemController.ts
 import { Request, Response } from 'express';
+import prisma from '../utils/prisma'; // ✅ Make sure this path is correct
 
 export const getMenuItems = async (_req: Request, res: Response) => {
   try {
@@ -12,9 +13,9 @@ export const getMenuItems = async (_req: Request, res: Response) => {
 
 export const createMenuItem = async (req: Request, res: Response) => {
   try {
-    const { name, price } = req.body;
+    const { name, price } = req.body; // ✅ body is available when using express.json() middleware
     const newItem = await prisma.menuItem.create({
-      data: { name, price }
+      data: { name, price: parseFloat(price) }, // ✅ Ensure price is a number
     });
     res.status(201).json(newItem);
   } catch (err) {

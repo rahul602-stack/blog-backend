@@ -18,6 +18,8 @@ import supportRoutes from './routes/supportRoutes';
 
 
 
+
+
 // Load environment variables
 dotenv.config();
 
@@ -36,6 +38,7 @@ app.use('/api/comments', commentRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/deliveries', deliveryRoutes);
 app.use('/api/inventory', inventoryRoutes);
+
 app.use('/api/menu', menuRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/cashier', cashierRoutes);
